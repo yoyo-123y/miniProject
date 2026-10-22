@@ -1,18 +1,30 @@
 #include <Arduino.h>
-
-// put function declarations here:
-int myFunction(int, int);
-
+#include "wifi.h"
+#include "drive.h"
+float lastMessageTime = 0;
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  initWifi();
+  Serial.begin(115200);
+  initMotors();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  if (checkWifiConnection() != 0) {
+    Serial.println("Failed to reconnect to WiFi");
+  }
+  char* packet = receiveUdpPacket();
+  if (packet != NULL) {
+    Serial.print("Received UDP packet: ");
+    Serial.println(packet);
+    driveMotors(packet);
+  }
+  if (millis() - lastMessageTime > 5000) {
+    restartUdp();
+    lastMessageTime = millis();
+  }
+  if (millis() - lastMessageTime > 20000) {
+    checkWifiConnection();
+    restartUdp();
+    lastMessageTime = millis();
+  }
 }
