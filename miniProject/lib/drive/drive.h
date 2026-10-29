@@ -2,6 +2,6 @@
 #define DRIVE_H
 
 void initMotors();
-void driveMotors(char* receivedData);
+void driveMotors(char* receivedData, int distance);
 
 #endif
