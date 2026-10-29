@@ -1,3 +1,4 @@
 [console_scripts]
+cv = my_robot.cvAction:main
 receive = my_robot.joyPublish:main
 send = my_robot.toEspSender:main

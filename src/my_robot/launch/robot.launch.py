@@ -22,5 +22,11 @@ def generate_launch_description():
             executable='receive',
             name='udp_sender',
             output='screen'
-        )
+        ),
+        Node(
+                package='my_robot',
+                executable='cv',
+                name='cv_receiver',
+                output='screen'
+            )
     ])

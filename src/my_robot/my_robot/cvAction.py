@@ -1,5 +1,3 @@
-from uwsgi import ready
-
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
@@ -15,12 +13,12 @@ class MySubscriber(Node):
         self.right = 0;
         self.forward = 0;
         self.backward = 0;
-        self.speeds = [100, 150, 255];
         self.Recieve_PORT = 4220;
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(("0.0.0.0", 4220))
-        self.publisher = self.create_publisher(Int32MultiArray,'/motor_pwm',10)
-    def callback(self, msg):
+        self.publisher = self.create_publisher(Int32MultiArray,'/cv_action',10)
+        self.timer = self.create_timer(0.05, self.callback)
+    def callback(self):
         pwm = Int32MultiArray()
         pwm.data = [0, 0,0,0]
         ready, _, _ = select.select([self.sock], [], [], 0)
@@ -39,21 +37,21 @@ class MySubscriber(Node):
             if(self.left == 0 and self.right == 0 and self.forward == 0 and self.backward == 0):
                 pwm.data = [0, 0, 0, 0]
             elif(self.left == 1 and self.right == 0 and self.forward == 0 and self.backward == 0):
-                pwm.data = [-self.speeds[self.speed], self.speeds[self.speed],-self.speeds[self.speed], self.speeds[self.speed]]
+                pwm.data = [-self.speed, self.speed, -self.speed, self.speed]
             elif(self.left == 0 and self.right == 1 and self.forward == 0 and self.backward == 0):
-                pwm.data = [self.speeds[self.speed], -self.speeds[self.speed],self.speeds[self.speed], -self.speeds[self.speed]]
+                pwm.data = [self.speed, -self.speed, self.speed, -self.speed]
             elif(self.left == 0 and self.right == 0 and self.forward == 1 and self.backward == 0):
-                pwm.data = [self.speeds[self.speed], self.speeds[self.speed],self.speeds[self.speed], self.speeds[self.speed]]
+                pwm.data = [self.speed, self.speed, self.speed, self.speed]
             elif(self.left == 0 and self.right == 0 and self.forward == 0 and self.backward == 1):
-                pwm.data = [-self.speeds[self.speed], -self.speeds[self.speed],-self.speeds[self.speed], -self.speeds[self.speed]]
+                pwm.data = [-self.speed, -self.speed,-self.speed, -self.speed]
             elif(self.left == 1 and self.right == 0 and self.forward == 1 and self.backward == 0):
-                pwm.data = [0, self.speeds[self.speed],0, self.speeds[self.speed]]
+                pwm.data = [0, self.speed,0, self.speed]
             elif(self.left == 0 and self.right == 1 and self.forward == 1 and self.backward == 0):
-                pwm.data = [self.speeds[self.speed], 0,self.speeds[self.speed], 0]
+                pwm.data = [self.speed, 0,self.speed, 0]
             elif(self.left == 1 and self.right == 0 and self.forward == 0 and self.backward == 1):
-                pwm.data = [-self.speeds[self.speed], 0,-self.speeds[self.speed], 0]
+                pwm.data = [-self.speed, 0,-self.speed, 0]
             elif(self.left == 0 and self.right == 1 and self.forward == 0 and self.backward == 1):
-                pwm.data = [0, -self.speeds[self.speed],0, -self.speeds[self.speed]]
+                pwm.data = [0, -self.speed,0, -self.speed]
             if(pwm.data[0] == -1 and pwm.data[1] == -1 and pwm.data[2] == -1 and pwm.data[3] == -1):
                 pwm.data = [-2, -2, -2, -2]
         else:

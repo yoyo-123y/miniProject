@@ -29,6 +29,7 @@ setup(
         'console_scripts': [
             'receive = my_robot.joyPublish:main',
             'send = my_robot.toEspSender:main',
+            'cv = my_robot.cvAction:main',
         ],
     },
 )
