@@ -1,6 +1,5 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Joy
 from std_msgs.msg import Int32MultiArray
 import socket
 class MySubscriber(Node):
@@ -14,9 +13,8 @@ class MySubscriber(Node):
         )
 
     def callback(self, msg):
-        self.get_logger().info(f'PWM values: {msg.data}')
-        myString = str(msg.data[0]) + "," + str(msg.data[1])
-        self.get_logger().info(f'Formatted string: {myString}')
+
+        myString = str(msg.data[0]) + "," + str(msg.data[1]) + "," + str(msg.data[2]) + "," + str(msg.data[3])
         self.sock.sendto(myString.encode('utf-8'),(self.ESP_IP, self.ESP_PORT))
         
 

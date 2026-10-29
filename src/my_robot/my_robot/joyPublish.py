@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 from std_msgs.msg import Int32MultiArray
+import socket
 class MySubscriber(Node):
     def __init__(self):
         super().__init__('my_subscriber')
@@ -18,7 +19,7 @@ class MySubscriber(Node):
         self.publisher = self.create_publisher(Int32MultiArray,'/motor_pwm',10)
     def callback(self, msg):
         pwm = Int32MultiArray()
-        pwm.data = [0, 0]
+        pwm.data = [0, 0 , 0 , 0]
         if(msg.buttons[10] == 1 and self.previousButton == 0):
             if(self.speed + 1> 2):
                 self.speed = 0;
@@ -43,26 +44,28 @@ class MySubscriber(Node):
             self.backward = 1;
         else:
             self.backward = 0;
+        # up-right, up-left, down-right, down-left
+
         if(self.left == 0 and self.right == 0 and self.forward == 0 and self.backward == 0):
-            pwm.data = [0, 0];
+            pwm.data = [0, 0, 0, 0]
         elif(self.left == 1 and self.right == 0 and self.forward == 0 and self.backward == 0):
-            pwm.data = [-self.speeds[self.speed], self.speeds[self.speed]];
+            pwm.data = [-self.speeds[self.speed], self.speeds[self.speed],-self.speeds[self.speed], self.speeds[self.speed]]
         elif(self.left == 0 and self.right == 1 and self.forward == 0 and self.backward == 0):
-            pwm.data = [self.speeds[self.speed], -self.speeds[self.speed]];
+            pwm.data = [self.speeds[self.speed], -self.speeds[self.speed],self.speeds[self.speed], -self.speeds[self.speed]]
         elif(self.left == 0 and self.right == 0 and self.forward == 1 and self.backward == 0):
-            pwm.data = [self.speeds[self.speed], self.speeds[self.speed]];
+            pwm.data = [self.speeds[self.speed], self.speeds[self.speed],self.speeds[self.speed], self.speeds[self.speed]]
         elif(self.left == 0 and self.right == 0 and self.forward == 0 and self.backward == 1):
-            pwm.data = [-self.speeds[self.speed], -self.speeds[self.speed]];
+            pwm.data = [-self.speeds[self.speed], -self.speeds[self.speed],-self.speeds[self.speed], -self.speeds[self.speed]]
         elif(self.left == 1 and self.right == 0 and self.forward == 1 and self.backward == 0):
-            pwm.data = [0, self.speeds[self.speed]];
+            pwm.data = [0, self.speeds[self.speed],0, self.speeds[self.speed]]
         elif(self.left == 0 and self.right == 1 and self.forward == 1 and self.backward == 0):
-            pwm.data = [self.speeds[self.speed], 0];
+            pwm.data = [self.speeds[self.speed], 0,self.speeds[self.speed], 0]
         elif(self.left == 1 and self.right == 0 and self.forward == 0 and self.backward == 1):
-            pwm.data = [-self.speeds[self.speed], 0];
+            pwm.data = [-self.speeds[self.speed], 0,-self.speeds[self.speed], 0]
         elif(self.left == 0 and self.right == 1 and self.forward == 0 and self.backward == 1):
-            pwm.data = [0, -self.speeds[self.speed]];
+            pwm.data = [0, -self.speeds[self.speed],0, -self.speeds[self.speed]]
         self.publisher.publish(pwm)
-        self.get_logger().info(f'Received: {self.left} {self.right} {self.forward} {self.backward} {self.speed}')
+                
 
 def main(args=None):
     rclpy.init(args=args)
